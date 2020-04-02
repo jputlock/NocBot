@@ -53,7 +53,7 @@ class Clash(LeagueAPICommand):
             # self.generate_player_embed(summoner)
         
         await msg.channel.send(
-            "https://na.op.gg/multi/query=" + "%2C".join(players)
+            "<https://na.op.gg/multi/query=" + "%2C".join(players) + ">"
         )
 
         

@@ -129,8 +129,8 @@ class Draft(Command, ReactionTrigger):
         [0] = draft
         [1] = captain 1
         [2] = captain 2
-        [optional 3] = randomize first pick
-        [optional 4] = snake draft or not
+        [optional] = randomize first pick
+        [optional] = snake draft or not
         """
         args = msg.content.split(" ")
 
@@ -170,22 +170,20 @@ class Draft(Command, ReactionTrigger):
         captains = [captain_1, captain_2]
         snake = False
 
-        # TODO: redo this, snake/random should be interchangeable
-
-        if len(args) >= 4 and args[3] == "random":
+        if "random" in content:
             random.shuffle(captains)
 
-        if len(args) >= 4 and args[4] == "snake":
-            snake = True # renet
+        if "snake" in content:
+            snake = True
+
+        voice_channel = msg.author.voice.channel
+        players = set(voice_channel.members)
         
         if msg.author.voice is None:
             await msg.channel.send(
                 client.messages["caller_not_connected"]
             )
             return
-
-        voice_channel = msg.author.voice.channel
-        players = set(voice_channel.members)
 
         if len(players) != 10:
             await msg.channel.send(

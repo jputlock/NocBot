@@ -64,6 +64,8 @@ class GhostClient(discord.Client):
                 replied = True
                 break
         
+        """
         if not replied:
             if not await invalid_command(self, msg):
                 utils.print_error("", f"A valid command was not replied to:\n{msg.content}")
+        """
