@@ -15,10 +15,10 @@ class Reset(Command):
 
         all_members = team_1_vc.members + team_2_vc.members
 
-        print("[RESET] Moving these users to the lobby:", [member.name for member in all_members])
+        utils.print_error(self, "Moving these users to the lobby:" + str([member.name for member in all_members]))
 
         for member in all_members:
             try:
                 await member.move_to(lobby_vc)
             except:
-                utils.print_error(f"Could not move {member.name} to the lobby channel.")
+                utils.print_error(self, f"Could not move {member.name} to the lobby channel.")

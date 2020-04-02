@@ -60,6 +60,7 @@ class LeagueAPICommand(Command):
 from .coinflip import Coinflip
 from .clash import Clash
 from .draft import Draft
+from .move import Move
 from .purge import Purge
 from .randomize import Randomize
 from .reset import Reset
@@ -69,6 +70,7 @@ all_commands = [
     Coinflip(),
     Clash(),
     Draft(),
+    Move(),
     Purge(),
     Randomize(),
     Reset(),
