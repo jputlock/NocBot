@@ -1,0 +1,4 @@
+discord.py>=1.2.3
+python-dotenv>=0.10.3
+requests>=2.22.0
+riotwatcher>=3.0.0
