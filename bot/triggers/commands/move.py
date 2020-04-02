@@ -11,8 +11,12 @@ class Move(Command):
     requires_server = True
 
     async def execute_command(self, client, msg, content):
-
-        target_channel_name = content.split(" ")[0]
+        
+        if not content:
+            await msg.channel.send(
+                f"Usage: {self.usage}"
+            )
+            return
 
         # grab the current vc
 
@@ -24,19 +28,20 @@ class Move(Command):
 
         # grab current vc members
 
-        members = msg.author.voice.channel.members
+        current_channel_members = msg.author.voice.channel.members
 
         # grab other vc from names
 
         target_vc = None
 
-        for channel in self.SERVER.channels:
-            if channel.name.lower() == target_channel_name.lower() and type(channel) is VoiceChannel:
+        for channel in client.SERVER.channels:
+            if channel.name.lower() == content.lower() and type(channel) is VoiceChannel:
                 target_vc = channel
+                # utils.print_error(self, f"Found channel named \'{content}\' with ID {channel.id}")
                 break
 
         if not target_vc:
-            utils.print_error(self, f"Voice channel \'{target_channel_name}\' not found.")
+            utils.print_error(self, f"Voice channel \'{content}\' not found.")
             await msg.channel.send(
                 client.messages["voice_channel_not_found"]
             )
@@ -44,9 +49,7 @@ class Move(Command):
 
         # move to the other vc
 
-        all_members = target_vc.members
-
-        for member in all_members:
+        for member in current_channel_members:
             try:
                 await member.move_to(target_vc)
             except:

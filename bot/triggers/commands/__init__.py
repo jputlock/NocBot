@@ -30,10 +30,10 @@ class Command():
             return
 
         if (
-            not utils.user_is_mod(client, msg.author) and # mods can use commands in any channel
+            not in_dm and
             client.command_channels_only and
             msg.channel.id not in client.config["command_channels"] and
-            not in_dm
+            not utils.user_is_mod(client, msg.author) # mods can use commands in any channel
         ):
             author = msg.author
             await msg.delete()
