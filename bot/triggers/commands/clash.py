@@ -1,6 +1,7 @@
 from . import LeagueAPICommand
 from .. import utils
 import json
+from requests import HTTPError
 
 class Clash(LeagueAPICommand):
     names = ["clash"]
@@ -19,9 +20,14 @@ class Clash(LeagueAPICommand):
             return
         
         player = content.split(" ")[0]
-
         
-        lookup_summoner = self.watcher.summoner.by_name(client.config["region"], player)
+        lookup_summoner = None
+
+        try:
+            lookup_summoner = self.watcher.summoner.by_name(client.config["region"], player)
+        except HTTPError as e:
+            utils.print_error(self, "An HTTP Error has occurred trying to get the summoner.")
+            return
 
         if not lookup_summoner:
             utils.print_error(self, "Can not receive summoner from League API Endpoint")
@@ -38,7 +44,14 @@ class Clash(LeagueAPICommand):
             }
         ]
         """
-        team = self.watcher.clash.by_summoner_id(client.config["region"], lookup_summoner['id'])
+
+        team = None
+        
+        try:
+            team = self.watcher.clash.by_summoner_id(client.config["region"], lookup_summoner['id'])
+        except HTTPError as e:
+            utils.print_error(self, "An HTTP Error has occurred trying to get the team.")
+            return
         
         if not team:
             utils.print_error(self, "Can not receive team from Clash API Endpoint")
@@ -47,7 +60,13 @@ class Clash(LeagueAPICommand):
         players = []
 
         for player in team:
-            summoner = self.watcher.summoner.by_id(client.config["region"], player['summonerId'])
+            summoner = None
+
+            try:
+                summoner = self.watcher.summoner.by_id(client.config["region"], player['summonerId'])
+            except HTTPError as e:
+                utils.print_error(self, "An HTTP Error has occurred trying to retrieve a team member.")
+                return
 
             players.append(summoner.name.replace(" ", ""))
             # self.generate_player_embed(summoner)
