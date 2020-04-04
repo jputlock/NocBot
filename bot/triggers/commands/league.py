@@ -73,6 +73,9 @@ class League(Command):
             game = self.dragon.watcher.spectator.by_summoner(client.config["region"], lookup_summoner['id'])
         except HTTPError as e:
             utils.print_error(self, "Player is not in a game.")
+            await msg.channel.send(
+                "That player is not in a game (or is in a bot game)."
+            )
             return
         
         if not game:
