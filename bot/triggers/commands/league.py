@@ -64,27 +64,28 @@ class League(Command):
         lookup_summoner = None
         lookup_summoner = self.dragon.watcher.summoner.by_name(client.config["region"], content)
 
-        if not lookup_summoner:
-            utils.print_error(self, "Can not receive summoner from League API Endpoint")
-            return
-        
-        game = None
-        try:
-            game = self.dragon.watcher.spectator.by_summoner(client.config["region"], lookup_summoner['id'])
-        except HTTPError as e:
-            utils.print_error(self, "Player is not in a game.")
-            await msg.channel.send(
-                "That player is not in a game (or is in a bot game)."
-            )
-            return
-        
-        if not game:
-            utils.print_error(self, "Can not receive game from League API Endpoint")
-            return
-        
-        players = [player['summonerName'] for player in game['participants']]
+        async with msg.channel.typing():
+            if not lookup_summoner:
+                utils.print_error(self, "Can not receive summoner from League API Endpoint")
+                return
+            
+            game = None
+            try:
+                game = self.dragon.watcher.spectator.by_summoner(client.config["region"], lookup_summoner['id'])
+            except HTTPError as e:
+                utils.print_error(self, "Player is not in a game.")
+                await msg.channel.send(
+                    "That player is not in a game (or is in a bot game)."
+                )
+                return
+            
+            if not game:
+                utils.print_error(self, "Can not receive game from League API Endpoint")
+                return
+            
+            players = [player['summonerName'] for player in game['participants']]
 
-        await msg.channel.send(
-            content="",
-            embed=self.get_embed(content, client, game)
-        )
+            await msg.channel.send(
+                content="",
+                embed=self.get_embed(content, client, game)
+            )
