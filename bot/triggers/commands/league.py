@@ -68,6 +68,7 @@ class League(Command):
             utils.print_error(self, "Can not receive summoner from League API Endpoint")
             return
         
+        game = None
         try:
             game = self.dragon.watcher.spectator.by_summoner(client.config["region"], lookup_summoner['id'])
         except HTTPError as e:
