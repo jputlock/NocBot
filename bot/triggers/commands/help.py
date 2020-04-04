@@ -39,7 +39,7 @@ class Help(Command):
                         response = discord.Embed(
                             title=embed_title, description=command_help
                         )
-                        await send_embed(msg, response, embed_title)
+                        await msg.channel.send(embed=response)
                         return
             await msg.channel.send(
                 f'Could not find command "{args[0]}".\n'
