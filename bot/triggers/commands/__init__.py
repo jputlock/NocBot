@@ -1,11 +1,8 @@
 from ..message_trigger import MessageTrigger
 from .. import utils
+
 import re
 import discord
-from riotwatcher import LolWatcher, ApiError
-import os
-
-global_watcher = LolWatcher(os.getenv("LEAGUE_TOKEN"))
 
 class Command():
     prefixes = ["!"]
@@ -53,13 +50,11 @@ class Command():
 
     def __lt__(self, other):
         return self.names[0] < other.names[0]
-
-class LeagueAPICommand(Command):
-    watcher = global_watcher
-
+    
 from .coinflip import Coinflip
 from .clash import Clash
 from .draft import Draft
+from .league import League
 from .move import Move
 from .purge import Purge
 from .randomize import Randomize
@@ -70,6 +65,7 @@ all_commands = [
     Coinflip(),
     Clash(),
     Draft(),
+    League(),
     Move(),
     Purge(),
     Randomize(),

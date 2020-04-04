@@ -6,22 +6,6 @@ import discord
 import random
 import re
 
-# TODO: move these constants somewhere else?
-
-symbols = {
-    "blue_team": ":blue_circle:",
-    "red_team": ":red_circle:"
-}
-
-team_names = [
-    f"{symbols['blue_team']} Team 1",
-    f"{symbols['red_team']} Team 2"
-]
-
-draft_order = [
-    1, 2, 2, 1, 2, 1, 1, 2
-]
-
 class Draft(Command, ReactionTrigger):
     names = ["draft"]
     description = "Start a 5v5 draft with two selected captains. Able to randomize which captain picks first and turn on a snake draft."
@@ -55,17 +39,17 @@ class Draft(Command, ReactionTrigger):
             ]
 
             for field in embed.fields:
-                if field.name == team_names[0]:
+                if field.name == utils.team_names[0]:
                     self.captains[0] = utils.user_from_mention(client, utils.find_first_mention(field.value))
                     self.team_1 = [utils.user_from_mention(client, utils.find_first_mention(line)) for line in field.value.split("\n")[1:]]
-                if field.name == team_names[1]:
+                if field.name == utils.team_names[1]:
                     self.captains[1] = utils.user_from_mention(client, utils.find_first_mention(field.value))
                     self.team_2 = [utils.user_from_mention(client, utils.find_first_mention(line)) for line in field.value.split("\n")[1:]]
 
         def make_pick(self, index):
             player = self.unpicked.pop(index)
             if self.snake:
-                if draft_order[self.turn] == 1:
+                if utils.draft_order[self.turn] == 1:
                     self.team_1.append(player)
                 else:
                     self.team_2.append(player)
@@ -80,7 +64,7 @@ class Draft(Command, ReactionTrigger):
             # write a message and wait for reaccs
             if len(self.unpicked) > 0:
                 if self.snake:
-                    return f"Pick {self.turn}:\n{draft_order[self.turn - 1].mention}, it's your turn to pick!"
+                    return f"Pick {self.turn}:\n{utils.draft_order[self.turn - 1].mention}, it's your turn to pick!"
                 else:
                     return f"Pick {self.turn}:\n{self.captains[(self.turn - 1) % 2].mention}, it's your turn to pick!"
             return "Finalized teams:"
@@ -104,13 +88,13 @@ class Draft(Command, ReactionTrigger):
             )
 
             embed.add_field(
-                name=team_names[0],
+                name=utils.team_names[0],
                 value=f"\n{captain_1.mention}\n" + "\n".join(
                     player.mention for player in self.team_1
                 )
             )
             embed.add_field(
-                name=team_names[1],
+                name=utils.team_names[1],
                 value=f"\n{captain_2.mention}\n" + "\n".join(
                     player.mention for player in self.team_2
                 )

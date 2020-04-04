@@ -32,6 +32,9 @@ class GhostClient(discord.Client):
             self.messages = json.load(messages_file)
         
         self.command_channels_only = len(self.config["command_channels"]) > 0
+
+        utils.setup_data_dragon(self)
+
         print("[+] Initialization complete.")
         if self.command_channels_only:
             print("[#] COMMAND CHANNEL ONLY ENABLED: Commands can only be run in specified channels. Edit config.json to add/remove channels.")

@@ -4,6 +4,7 @@ import discord
 import re
 import traceback
 
+from utils.datadragon import DataDragon
 
 emoji_numbers = [
     "\u0030\u20E3", #  0
@@ -24,8 +25,18 @@ symbols = {
     "red_team": ":red_circle:"
 }
 
+team_names = [
+    f"{symbols['blue_team']} Team 1",
+    f"{symbols['red_team']} Team 2"
+]
+
+draft_order = [
+    1, 2, 2, 1, 2, 1, 1, 2
+]
+
 no_matching_results_emote = "🚫"
 
+global_dragon = None
 
 async def generate_react_menu(
     sendable, user_id, opening_message, max_length, option_list, cancel_message
@@ -42,6 +53,9 @@ async def generate_react_menu(
         await sent_msg.add_reaction(emoji_numbers[i])
     await sent_msg.add_reaction(no_matching_results_emote)
 
+def setup_data_dragon(client):
+    global global_dragon
+    global_dragon = DataDragon(client)
 
 def user_is_mod(client, user) -> bool:
     return any(id in [role.id for role in user.roles] for id in client.config["mod_role_ids"])

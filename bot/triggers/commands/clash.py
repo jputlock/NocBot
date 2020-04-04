@@ -1,9 +1,9 @@
-from . import LeagueAPICommand
+from . import Command
 from .. import utils
 import json
 from requests import HTTPError
 
-class Clash(LeagueAPICommand):
+class Clash(Command):
     names = ["clash"]
     description = "Get the information about the clash team that a player is on."
     usage = "!clash <summoner>"
@@ -20,11 +20,13 @@ class Clash(LeagueAPICommand):
             return
         
         player = content.split(" ")[0]
+
+        self.dragon = utils.global_dragon
         
         lookup_summoner = None
 
         try:
-            lookup_summoner = self.watcher.summoner.by_name(client.config["region"], player)
+            lookup_summoner = self.dragon.watcher.summoner.by_name(client.config["region"], player)
         except HTTPError as e:
             utils.print_error(self, "An HTTP Error has occurred trying to get the summoner.")
             return
@@ -48,7 +50,7 @@ class Clash(LeagueAPICommand):
         team = None
         
         try:
-            team = self.watcher.clash.by_summoner_id(client.config["region"], lookup_summoner['id'])
+            team = self.dragon.watcher.clash.by_summoner_id(client.config["region"], lookup_summoner['id'])
         except HTTPError as e:
             utils.print_error(self, "An HTTP Error has occurred trying to get the team.")
             return
@@ -63,7 +65,7 @@ class Clash(LeagueAPICommand):
             summoner = None
 
             try:
-                summoner = self.watcher.summoner.by_id(client.config["region"], player['summonerId'])
+                summoner = self.dragon.watcher.summoner.by_id(client.config["region"], player['summonerId'])
             except HTTPError as e:
                 utils.print_error(self, "An HTTP Error has occurred trying to retrieve a team member.")
                 return
