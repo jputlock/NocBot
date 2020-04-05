@@ -41,7 +41,7 @@ class League(Command):
         mins = time // 60
         secs = time % 60
 
-        desc = "Game Time: " + (f"{mins}:{secs}" if hrs == 0 else f"{hrs}:{mins}:{secs}") + "\n"
+        desc = "Game Time: " + (f"{mins:2d}:{secs:02d}" if hrs == 0 else f"{hrs}:{mins:02d}:{secs:02d}") + "\n"
 
         for player in game['participants']:
 
