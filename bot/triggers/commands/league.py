@@ -3,11 +3,32 @@ from .. import utils
 import json
 import discord
 from requests import HTTPError
+from math import isclose
 
 class League(Command):
     names = ["league"]
     description = "Get the stats of the current league game of a summoner."
     usage = "!league <summoner>"
+
+    tiers = {
+        "Iron": "I",
+        "Bronze": "B",
+        "Silver": "S",
+        "Gold": "G",
+        "Platinum": "P",
+        "Diamond": "D",
+        "Master": "M",
+        "Grandmaster": "GM",
+        "Challenger": "C"
+    }
+
+    romans = {
+        "I": "1",
+        "II": "2",
+        "III": "3",
+        "IV": "4",
+        "V": "5",
+    }
 
     def get_embed(self, target, client, game):
 
@@ -19,13 +40,27 @@ class League(Command):
 
             summoner = self.dragon.watcher.league.by_summoner(client.config['region'], player['summonerId'])
 
-            rank = ""
+            rank = "Unranked"
+            win_rate = 0
             for league_entry in summoner:
+                wins = league_entry['wins']
+                losses = league_entry['losses']
+                if league_entry['queueType'] == "RANKED_FLEX_5x5":
+                    rank = self.tiers[league_entry['tier'].title()] + self.romans[league_entry['rank']]
+                    if wins + losses == 0:
+                        win_rate = 0
+                    else:
+                        win_rate = 100 * ( wins / ( wins + losses ) )
                 if league_entry['queueType'] == "RANKED_SOLO_5x5":
-                    rank = league_entry['tier'].title() + " " + league_entry['rank']
+                    rank = self.tiers[league_entry['tier'].title()] + self.romans[league_entry['rank']]
+                    if wins + losses == 0:
+                        win_rate = 0
+                    else:
+                        win_rate = 100 * ( wins / ( wins + losses ) )
                     break
 
             player['rank'] = rank
+            player['win_rate'] = win_rate
 
             if player['teamId'] == 100:
                 team_1.append(player)
@@ -35,14 +70,16 @@ class League(Command):
         desc = utils.team_names[0] + "\n" + "\n".join(
                 f"{player['summonerName']} ({player['rank']}): {self.dragon.champions[player['championId']]['name']} " +
                 f"[{self.dragon.summoners[player['spell1Id']]['name']}/{self.dragon.summoners[player['spell2Id']]['name']}] " +
-                f"({self.dragon.runes[player['perks']['perkStyle']][player['perks']['perkIds'][0]]})"
+                f"({self.dragon.runes[player['perks']['perkStyle']][player['perks']['perkIds'][0]]})\n" +
+                "└─ Overall Win Rate: " + (f"{player['win_rate']:2.0f}%" if isclose(player['win_rate'] % 1, 0, rel_tol=0.1) else f"{player['win_rate']:2.1f}%")
                 for player in team_1
             )
 
         desc += "\n" + utils.team_names[1] + "\n" + "\n".join(
                 f"{player['summonerName']} ({player['rank']}): {self.dragon.champions[player['championId']]['name']} " +
                 f"[{self.dragon.summoners[player['spell1Id']]['name']}/{self.dragon.summoners[player['spell2Id']]['name']}] " +
-                f"({self.dragon.runes[player['perks']['perkStyle']][player['perks']['perkIds'][0]]})"
+                f"({self.dragon.runes[player['perks']['perkStyle']][player['perks']['perkIds'][0]]})\n" +
+                "└─ Overall Win Rate: " + (f"{player['win_rate']:2.0f}%" if isclose(player['win_rate'] % 1, 0, rel_tol=0.1) else f"{player['win_rate']:2.1f}%")
                 for player in team_2
             )
 

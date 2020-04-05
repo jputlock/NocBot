@@ -15,10 +15,11 @@ class DataDragon():
         # all types ['item', 'rune', 'mastery', 'summoner', 'champion', 'profileicon', 'map', 'language', 'sticker']
 
         types = ["champion", "summoner", "rune"]
+        version_dict = self.watcher.data_dragon.versions_for_region(client.config["region"])["n"]
 
         for data_type in types:            
             # get league's latest version
-            latest = self.watcher.data_dragon.versions_for_region(client.config["region"])["n"][data_type]
+            latest = version_dict[data_type]
 
             # get info
             info = None
@@ -31,7 +32,7 @@ class DataDragon():
                 for key in info['data']:
                     self.summoners[int(info['data'][key]['key'])] = info['data'][key]
             elif data_type == "rune":
-                latest = "10.7.1" # riot fucked this up in /realms/na.json
+                latest = version_dict["champion"] # riot fucked this up in /realms/na.json
                 info = self.watcher.data_dragon.runes_reforged(latest, 'en_US')
                 for rune_category in info:
                     current_runes = {}
