@@ -36,6 +36,13 @@ class League(Command):
 
         team_1, team_2 = [], []
 
+        time = game['gameLength']
+        hrs = time // 3600
+        mins = time // 60
+        secs = time % 60
+
+        desc = "Game Time: " + (f"{mins}:{secs}" if hrs == 0 else f"{hrs}:{mins}:{secs}") + "\n"
+
         for player in game['participants']:
 
             summoner = self.dragon.watcher.league.by_summoner(client.config['region'], player['summonerId'])
@@ -45,18 +52,14 @@ class League(Command):
             for league_entry in summoner:
                 wins = league_entry['wins']
                 losses = league_entry['losses']
+                
+                print(league_entry['queueType'])
                 if league_entry['queueType'] == "RANKED_FLEX_5x5":
                     rank = self.tiers[league_entry['tier'].title()] + self.romans[league_entry['rank']]
-                    if wins + losses == 0:
-                        win_rate = 0
-                    else:
-                        win_rate = 100 * ( wins / ( wins + losses ) )
+                    win_rate = 100 * ( wins / ( wins + losses ) )
                 if league_entry['queueType'] == "RANKED_SOLO_5x5":
                     rank = self.tiers[league_entry['tier'].title()] + self.romans[league_entry['rank']]
-                    if wins + losses == 0:
-                        win_rate = 0
-                    else:
-                        win_rate = 100 * ( wins / ( wins + losses ) )
+                    win_rate = 100 * ( wins / ( wins + losses ) )
                     break
 
             player['rank'] = rank
@@ -67,7 +70,7 @@ class League(Command):
             else:
                 team_2.append(player)
 
-        desc = utils.team_names[0] + "\n" + "\n".join(
+        desc += utils.team_names[0] + "\n" + "\n".join(
                 f"{player['summonerName']} ({player['rank']}): {self.dragon.champions[player['championId']]['name']} " +
                 f"[{self.dragon.summoners[player['spell1Id']]['name']}/{self.dragon.summoners[player['spell2Id']]['name']}] " +
                 f"({self.dragon.runes[player['perks']['perkStyle']][player['perks']['perkIds'][0]]})\n" +
