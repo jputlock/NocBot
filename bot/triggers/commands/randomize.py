@@ -20,7 +20,7 @@ class Randomize(Command):
         connected_members = msg.author.voice.channel.members
 
         if len(connected_members) != 10:
-            utils.print_error(self, "Need exactly 10 to randomize")
+            utils.log(self, "Need exactly 10 to randomize")
             await msg.channel.send(
                 client.messages["need_ten_players"]
             )
@@ -46,10 +46,10 @@ class Randomize(Command):
             try:
                 await member.move_to(team_1_vc)
             except:
-                utils.print_error(self, f"Could not move {member.name} to Team 1")
+                utils.log(self, f"Could not move {member.name} to Team 1")
         
         for member in team_2:
             try:
                 await member.move_to(team_2_vc)
             except:
-                utils.print_error(self, f"Could not move {member.name} to Team 2")
+                utils.log(self, f"Could not move {member.name} to Team 2")

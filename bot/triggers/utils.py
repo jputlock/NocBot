@@ -7,7 +7,7 @@ import traceback
 from utils.datadragon import DataDragon
 
 emoji_numbers = [
-    "\u0030\u20E3", #  0
+    "\u0030\u20E3", # 0
     "\u0031\u20E3",
     "\u0032\u20E3",
     "\u0033\u20E3",
@@ -20,14 +20,14 @@ emoji_numbers = [
     "\U0001F51F",   # 10
 ]
 
-symbols = {
+team_symbols = {
     "blue_team": ":blue_circle:",
     "red_team": ":red_circle:"
 }
 
 team_names = [
-    f"{symbols['blue_team']} Team 1",
-    f"{symbols['red_team']} Team 2"
+    f"{team_symbols['blue_team']} Team 1",
+    f"{team_symbols['red_team']} Team 2"
 ]
 
 draft_order = [
@@ -114,7 +114,7 @@ def get_correct_attr(obj, attr, client):
     else:
         return None
 
-def print_error(trigger, text):
+def log(trigger, text):
     if type(trigger) == str:
         print(f"[!] {text}")
     else:

@@ -77,7 +77,7 @@ class Draft(Command, ReactionTrigger):
             if len(self.unpicked) > 0:
                 desc = f"Unpicked Players:\n" + "\n".join(
                     [
-                        utils.number_emoji[i]["name"] + f" {player.mention}"
+                        utils.emoji_numbers[i] + f" {player.mention}"
                         for i, player in enumerate(self.unpicked, 1)
                     ]
                 )
@@ -109,17 +109,10 @@ class Draft(Command, ReactionTrigger):
             )
             return
         
-        """
-        [0] = draft
-        [1] = captain 1
-        [2] = captain 2
-        [optional] = randomize first pick
-        [optional] = snake draft or not
-        """
         args = msg.content.split(" ")
 
         if len(args) < 3:
-            utils.print_error(self, "Tried to draft without at least 3 arguments")
+            utils.log(self, "Tried to draft without at least 3 arguments")
             await msg.channel.send(
                 f"Usage: {self.usage}"
             )
@@ -177,7 +170,7 @@ class Draft(Command, ReactionTrigger):
 
         for captain in captains:
             if captain not in players:
-                utils.print_error(self, f"{captain.name} is not in the voice channel!")
+                utils.log(self, f"{captain.name} is not in the voice channel!")
                 await msg.channel.send(
                     client.messages["draft_captain_not_connected"]
                 )
@@ -201,12 +194,12 @@ class Draft(Command, ReactionTrigger):
             snake
         )
         
-        msg = await msg.channel.send(
+        message = await msg.channel.send(
             content=state.get_content(), embed=state.get_embed()
         )
 
         for reaction in utils.emoji_numbers[1:len(state.unpicked) + 1]:
-                await msg.add_reaction(reaction)
+                await message.add_reaction(reaction)
     
     async def execute_reaction(self, client, reaction, channel, msg, user):
         if client.user.id == reaction.user_id:
@@ -219,26 +212,26 @@ class Draft(Command, ReactionTrigger):
 
         await msg.remove_reaction(reaction.emoji, user)
 
-        state.parse_message(client, msg)
+        state.parse_msg(client, msg)
 
         # filter out people who shouldn't go or invalid emojis
 
         possible_emojis = utils.emoji_numbers[1:len(state.unpicked) + 1]
 
-        if reaction.emoji not in possible_emojis:
+        if reaction.emoji.name not in possible_emojis:
             return
 
         if user not in state.captains:
-            utils.print_error(self, "Somebody who isn't a captain tried to go")
+            utils.log(self, "Somebody who isn't a captain tried to go")
             return
         
         if user != state.captains[(state.turn - 1) % 2]:
-            utils.print_error(self, "A captain tried to go out of turn!")
+            utils.log(self, "A captain tried to go out of turn!")
             return
 
         # update it to swap the player to the correct team
 
-        state.make_pick(possible_emojis.index(reaction.emoji))
+        state.make_pick(possible_emojis.index(reaction.emoji.name))
 
         # update the message
 

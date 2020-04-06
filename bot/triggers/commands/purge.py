@@ -20,4 +20,4 @@ class Purge(Command):
             num = int(arr[0]) + 1
             await msg.channel.purge(limit=num)
         except:
-            utils.print_error(self, f"Could not parse # for purge command, content = \'{content}\'")
+            utils.log(self, f"Could not parse # for purge command, content = \'{content}\'")

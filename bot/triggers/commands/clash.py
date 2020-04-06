@@ -28,11 +28,11 @@ class Clash(Command):
         try:
             lookup_summoner = self.dragon.watcher.summoner.by_name(client.config["region"], player)
         except HTTPError as e:
-            utils.print_error(self, "An HTTP Error has occurred trying to get the summoner.")
+            utils.log(self, "An HTTP Error has occurred trying to get the summoner.")
             return
 
         if not lookup_summoner:
-            utils.print_error(self, "Can not receive summoner from League API Endpoint")
+            utils.log(self, "Can not receive summoner from League API Endpoint")
             return
         
         """
@@ -52,11 +52,11 @@ class Clash(Command):
         try:
             team = self.dragon.watcher.clash.by_summoner_id(client.config["region"], lookup_summoner['id'])
         except HTTPError as e:
-            utils.print_error(self, "An HTTP Error has occurred trying to get the team.")
+            utils.log(self, "An HTTP Error has occurred trying to get the team.")
             return
         
         if not team:
-            utils.print_error(self, "Can not receive team from Clash API Endpoint")
+            utils.log(self, "Can not receive team from Clash API Endpoint")
             return
 
         players = []
@@ -67,7 +67,7 @@ class Clash(Command):
             try:
                 summoner = self.dragon.watcher.summoner.by_id(client.config["region"], player['summonerId'])
             except HTTPError as e:
-                utils.print_error(self, "An HTTP Error has occurred trying to retrieve a team member.")
+                utils.log(self, "An HTTP Error has occurred trying to retrieve a team member.")
                 return
 
             players.append(summoner.name.replace(" ", ""))

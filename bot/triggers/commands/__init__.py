@@ -51,6 +51,7 @@ class Command():
     def __lt__(self, other):
         return self.names[0] < other.names[0]
     
+from .bets import Bets
 from .coinflip import Coinflip
 from .clash import Clash
 from .draft import Draft
@@ -62,6 +63,7 @@ from .reset import Reset
 
 # Commands will auto alphabetize
 all_commands = [
+    Bets(),
     Coinflip(),
     Clash(),
     Draft(),

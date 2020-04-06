@@ -37,11 +37,11 @@ class Move(Command):
         for channel in client.SERVER.channels:
             if channel.name.lower() == content.lower() and type(channel) is VoiceChannel:
                 target_vc = channel
-                # utils.print_error(self, f"Found channel named \'{content}\' with ID {channel.id}")
+                # utils.log(self, f"Found channel named \'{content}\' with ID {channel.id}")
                 break
 
         if not target_vc:
-            utils.print_error(self, f"Voice channel \'{content}\' not found.")
+            utils.log(self, f"Voice channel \'{content}\' not found.")
             await msg.channel.send(
                 client.messages["voice_channel_not_found"]
             )
@@ -53,4 +53,4 @@ class Move(Command):
             try:
                 await member.move_to(target_vc)
             except:
-                utils.print_error(self, f"Could not move {member.name} to {target_vc.name}")
+                utils.log(self, f"Could not move {member.name} to {target_vc.name}")

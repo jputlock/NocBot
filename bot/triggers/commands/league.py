@@ -1,6 +1,5 @@
 from . import Command
 from .. import utils
-import json
 import discord
 from requests import HTTPError
 from math import isclose
@@ -32,16 +31,14 @@ class League(Command):
 
     def get_embed(self, target, client, game):
 
-        embed = discord.Embed
-
-        team_1, team_2 = [], []
-
         time = game['gameLength']
         hrs = time // 3600
         mins = time // 60
         secs = time % 60
 
         desc = "Game Time: " + (f"{mins:2d}:{secs:02d}" if hrs == 0 else f"{hrs}:{mins:02d}:{secs:02d}") + "\n"
+
+        team_1, team_2 = [], []
 
         for player in game['participants']:
 
@@ -69,7 +66,7 @@ class League(Command):
                 team_1.append(player)
             else:
                 team_2.append(player)
-
+        
         desc += utils.team_names[0] + "\n" + "\n".join(
                 f"{player['summonerName']} ({player['rank']}): {self.dragon.champions[player['championId']]['name']} " +
                 f"[{self.dragon.summoners[player['spell1Id']]['name']}/{self.dragon.summoners[player['spell2Id']]['name']}] " +
@@ -106,24 +103,22 @@ class League(Command):
 
         async with msg.channel.typing():
             if not lookup_summoner:
-                utils.print_error(self, "Can not receive summoner from League API Endpoint")
+                utils.log(self, "Can not receive summoner from League API Endpoint")
                 return
             
             game = None
             try:
                 game = self.dragon.watcher.spectator.by_summoner(client.config["region"], lookup_summoner['id'])
             except HTTPError as e:
-                utils.print_error(self, "Player is not in a game.")
+                utils.log(self, "Player is not in a game.")
                 await msg.channel.send(
                     "That player is not in a game (or is in a bot game)."
                 )
                 return
             
             if not game:
-                utils.print_error(self, "Can not receive game from League API Endpoint")
+                utils.log(self, "Can not receive game from League API Endpoint")
                 return
-            
-            players = [player['summonerName'] for player in game['participants']]
 
             await msg.channel.send(
                 content="",

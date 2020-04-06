@@ -1,0 +1,19 @@
+{
+    "invalid_permissions": "You do not have permissions to use this command!",
+    "command_channels_only": "You can only use commands in the designated bot channels.",
+    "requires_server": "You can only use that command in a server.",
+
+    "draft_no_captain1": "Could not find Captain 1.",
+    "draft_no_captain2": "Could not find Captain 2.",
+    "draft_captain_not_connected": "A captain is missing from the voice channel.",
+    "draft_same_captain": "You have to have two unique captains.",
+    "draft_bot_captain": "You cannot have a bot as a captain.",
+
+    "blue_won": "Blue team won the game!",
+    "red_won": "Red team won the game!",
+    
+    "voice_channel_not_found": "Could not find a voice channel with that name.",
+    "need_ten_players": "You need exactly 10 players in the voice channel to use this command.",
+    "caller_not_connected": "You need to be connected to a voice channel to use that command!",
+    "team_calls_not_empty": "At least one of the channels for team assignment is not empty."
+}
