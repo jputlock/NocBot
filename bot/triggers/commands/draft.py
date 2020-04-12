@@ -14,7 +14,7 @@ class Draft(Command, ReactionTrigger):
     requires_server = True
 
     class DraftState:
-        def __init__(self, players=None, captains=None, snake=False):
+        def __init__(self, players=[], captains=[], snake=False):
             self.unpicked = players
             self.captains = captains
             self.snake = snake
@@ -23,51 +23,60 @@ class Draft(Command, ReactionTrigger):
             self.team_2 = []
             self.turn = 0
 
+        def get_picking_captain(self):
+            if self.snake:
+                return self.captains[utils.draft_order[self.turn - 1]]
+            return self.captains[(self.turn - 1) % 2]
+
         def parse_msg(self, client, message):
 
             content = message.content
+            if content == "Finalized Teams:":
+                self.turn = 7
+            else:
+                self.turn = int(re.search("Pick (\d+)", content).group(1))
 
-            self.turn = int(re.match("Pick (\d+)", content).group(1))
+            if "\u200B" in content:
+                self.snake = True
 
             embed = message.embeds[0]
 
             self.captains = [None] * 2
 
-            self.unpicked = [
-                utils.user_from_mention(client, utils.find_first_mention(line))
-                for line in embed.description.split("\n")[1:]
-            ]
+            if embed.description:
+                self.unpicked = [
+                    utils.user_from_mention(client, utils.find_first_mention(line))
+                    for line in embed.description.split("\n")[1:]
+                ]
 
             for field in embed.fields:
                 if field.name == utils.team_names[0]:
                     self.captains[0] = utils.user_from_mention(client, utils.find_first_mention(field.value))
-                    self.team_1 = [utils.user_from_mention(client, utils.find_first_mention(line)) for line in field.value.split("\n")[1:]]
+                    self.team_1 = [utils.user_from_mention(client, utils.find_first_mention(line)) for line in field.value.split("\n")]
                 if field.name == utils.team_names[1]:
                     self.captains[1] = utils.user_from_mention(client, utils.find_first_mention(field.value))
-                    self.team_2 = [utils.user_from_mention(client, utils.find_first_mention(line)) for line in field.value.split("\n")[1:]]
+                    self.team_2 = [utils.user_from_mention(client, utils.find_first_mention(line)) for line in field.value.split("\n")]
 
         def make_pick(self, index):
             player = self.unpicked.pop(index)
-            if self.snake:
-                if utils.draft_order[self.turn] == 1:
-                    self.team_1.append(player)
-                else:
-                    self.team_2.append(player)
+            team = self.captains.index(self.get_picking_captain())
+            if team == 0:
+                self.team_1.append(player)
+            elif team == 1:
+                self.team_2.append(player)
             else:
-                if (self.turn - 1) % 2 == 0:
-                    self.team_1.append(player)
-                else:
-                    self.team_2.append(player)
+                utils.log(self, "Error making a pick!")
 
         def get_content(self):
             self.turn += 1
             # write a message and wait for reaccs
             if len(self.unpicked) > 0:
+                answer = ""
                 if self.snake:
-                    return f"Pick {self.turn}:\n{utils.draft_order[self.turn - 1].mention}, it's your turn to pick!"
-                else:
-                    return f"Pick {self.turn}:\n{self.captains[(self.turn - 1) % 2].mention}, it's your turn to pick!"
-            return "Finalized teams:"
+                    answer += "\u200B"
+                answer += f"Pick {self.turn}:\n{self.get_picking_captain().mention}, it's your turn to pick!"
+                return answer
+            return "Finalized Teams:"
 
         def get_embed(self):
             captain_1, captain_2 = self.captains
@@ -90,13 +99,13 @@ class Draft(Command, ReactionTrigger):
             embed.add_field(
                 name=utils.team_names[0],
                 value=f"\n{captain_1.mention}\n" + "\n".join(
-                    player.mention for player in self.team_1
+                    player.mention for player in self.team_1[1:]
                 )
             )
             embed.add_field(
                 name=utils.team_names[1],
                 value=f"\n{captain_2.mention}\n" + "\n".join(
-                    player.mention for player in self.team_2
+                    player.mention for player in self.team_2[1:]
                 )
             )
 
@@ -162,11 +171,11 @@ class Draft(Command, ReactionTrigger):
             )
             return
 
-        if len(players) != 10:
-            await msg.channel.send(
-                client.messages["need_ten_players"]
-            )
-            return
+        # if len(players) != 10:
+        #     await msg.channel.send(
+        #         client.messages["need_ten_players"]
+        #     )
+        #     return
 
         for captain in captains:
             if captain not in players:
@@ -198,8 +207,13 @@ class Draft(Command, ReactionTrigger):
             content=state.get_content(), embed=state.get_embed()
         )
 
-        for reaction in utils.emoji_numbers[1:len(state.unpicked) + 1]:
-                await message.add_reaction(reaction)
+        emojis = utils.emoji_numbers[1:len(state.unpicked) + 1]
+
+        if len(emojis) == 0:
+            await message.add_reaction("\u2705")
+
+        for reaction in emojis:
+            await message.add_reaction(reaction)
     
     async def execute_reaction(self, client, reaction, channel, msg, user):
         if client.user.id == reaction.user_id:
@@ -216,7 +230,32 @@ class Draft(Command, ReactionTrigger):
 
         # filter out people who shouldn't go or invalid emojis
 
+        check_mark = "\u2705"
         possible_emojis = utils.emoji_numbers[1:len(state.unpicked) + 1]
+
+        if len(possible_emojis) == 0 and reaction.emoji.name == check_mark:
+            
+            team_1_vc = client.get_channel(client.config["TEAM_1_ID"])
+            team_2_vc = client.get_channel(client.config["TEAM_2_ID"])
+
+            for user in state.team_1:
+                member = client.SERVER.get_member(user.id)
+                try:
+                    await member.move_to(team_1_vc)
+                except Exception as e:
+                    utils.log(self, f"{e}")
+                    utils.log(self, f"Could not move {member.name} to Team 1")
+            
+            for user in state.team_2:
+                member = client.SERVER.get_member(user.id)
+                try:
+                    await member.move_to(team_2_vc)
+                except Exception as e:
+                    utils.log(self, f"{e}")
+                    utils.log(self, f"Could not move {member.name} to Team 2")
+            
+            await msg.remove_reaction(reaction.emoji, client.user)
+            return
 
         if reaction.emoji.name not in possible_emojis:
             return
@@ -225,7 +264,7 @@ class Draft(Command, ReactionTrigger):
             utils.log(self, "Somebody who isn't a captain tried to go")
             return
         
-        if user != state.captains[(state.turn - 1) % 2]:
+        if user != state.get_picking_captain():
             utils.log(self, "A captain tried to go out of turn!")
             return
 
@@ -237,9 +276,15 @@ class Draft(Command, ReactionTrigger):
 
         await msg.delete()
 
+        content = state.get_content()
+        embed = state.get_embed()
+
         new_msg = await channel.send(
-            content=state.get_content(), embed=state.get_embed()
+            content=content, embed=embed
         )
+
+        if content == "Finalized Teams:":
+            await new_msg.add_reaction(check_mark)
         
         for reaction in utils.emoji_numbers[1:len(state.unpicked) + 1]:
             await new_msg.add_reaction(reaction)

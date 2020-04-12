@@ -31,7 +31,7 @@ team_names = [
 ]
 
 draft_order = [
-    1, 2, 2, 1, 2, 1, 1, 2
+    0, 1, 1, 0, 1, 0, 0, 1
 ]
 
 no_matching_results_emote = "🚫"
