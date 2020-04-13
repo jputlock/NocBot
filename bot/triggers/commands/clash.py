@@ -8,7 +8,6 @@ class Clash(Command):
     names = ["clash"]
     description = "Get the information about the clash team that a player is on."
     usage = "!clash <summoner>"
-    requires_server = True
 
     def generate_team_msg(self, client, team):
 
@@ -39,7 +38,7 @@ class Clash(Command):
                 "captain": (clash_summoner['role'] == "CAPTAIN")
             }
         
-        roles = ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY", "UNSELECTED"]
+        roles = ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY", "FILL", "UNSELECTED"]
         desc = ""
         i = 0
         while i < len(roles):
