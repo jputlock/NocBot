@@ -114,29 +114,27 @@ def get_correct_attr(obj, attr, client):
     else:
         return None
 
-def log(trigger, text):
+def log(trigger, text, client):
+    content = ""
     if type(trigger) == str:
-        print(f"[!] {text}")
+        content = f"[!] {text}"
     else:
-        print(f"[{type(trigger).__name__.upper()}] {text}")
-
-# prints a traceback and sends it to discord
-# to get a traceback sent to steam put this line in any except: call
-# await utils.sendTraceback(client, "")
-async def sendTraceback(client, content=""):
-    # print the traceback to the terminal
+        content = f"[{type(trigger).__name__.upper()}] {text}"
     print(content)
-    print(traceback.format_exc())
+    with open(client.log_filename, "r+") as log_file:
+        for line in log_file:
+            pass
+        log_file.write(content + "\n")
 
-    # if there is a traceback server and channel, send the traceback in discord as well
-    """
-    try:
-        msg_to_send = f"```bash\n{traceback.format_exc()}\n```"
-        if content:
-            msg_to_send = f"`{content}`\n" + msg_to_send
-        await client.TRACEBACK_CHANNEL.send(msg_to_send)
-    except:
-        print(
-            "\nNote: traceback was not sent to Discord, if you want this double check your config.json"
-        )
-    """
+async def log_traceback(trigger, client):
+    text = ""
+    if type(trigger) == str:
+        text = f"[!] {traceback.format_exc()}"
+    else:
+        text = f"[{type(trigger).__name__.upper()}] {traceback.format_exc()}"
+    print(text)
+    with open(client.log_filename, "r+") as log_file:
+        for line in log_file:
+            pass
+        log_file.write(text + "\n")
+

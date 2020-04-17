@@ -4,6 +4,7 @@ from discord import ChannelType
 import json
 import subprocess
 import asyncio
+import traceback
 
 from .triggers import msg_triggers, reaction_triggers
 from .triggers import utils
@@ -16,12 +17,16 @@ class GhostClient(discord.Client):
         config_filename="config/config.json",
         roles_filename="config/roles.json",
         messages_filename="config/messages.json",
+        log_filename="nocbot.log",
         path=sys.path[0] + "/"
     ):
         super().__init__()
         config_filename = path + config_filename
         roles_filename = path + roles_filename
         messages_filename = path + messages_filename
+        self.log_filename = path + log_filename
+        with open(log_filename, "w") as fake_news:
+            pass
         with open(config_filename, "r") as config_file:
             self.config = json.load(config_file)
         
@@ -63,7 +68,7 @@ class GhostClient(discord.Client):
                     replied = True
                     break
             except Exception as e:
-                await utils.sendTraceback(self, msg.content)
+                await utils.log_traceback(self, self)
                 replied = True
                 break
         
@@ -96,4 +101,4 @@ class GhostClient(discord.Client):
                 if result is False:
                     break
             except Exception as e:
-                utils.log(self, f"{e}")
+                utils.log_traceback(self, self)

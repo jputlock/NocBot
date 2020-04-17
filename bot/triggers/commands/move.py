@@ -41,7 +41,7 @@ class Move(Command):
                 break
 
         if not target_vc:
-            utils.log(self, f"Voice channel \'{content}\' not found.")
+            utils.log(self, f"Voice channel \'{content}\' not found.", client)
             await msg.channel.send(
                 client.messages["voice_channel_not_found"]
             )
@@ -53,4 +53,4 @@ class Move(Command):
             try:
                 await member.move_to(target_vc)
             except:
-                utils.log(self, f"Could not move {member.name} to {target_vc.name}")
+                utils.log(self, f"Could not move {member.name} to {target_vc.name}", client)

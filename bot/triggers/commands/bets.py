@@ -92,21 +92,21 @@ class Bets(Command, ReactionTrigger):
 
         async with msg.channel.typing():
             if not lookup_summoner:
-                utils.log(self, "Can not receive summoner from League API Endpoint")
+                utils.log(self, "Can not receive summoner from League API Endpoint", client)
                 return
             
             game = None
             try:
                 game = self.dragon.watcher.spectator.by_summoner(client.config["region"], lookup_summoner['id'])
             except HTTPError as e:
-                utils.log(self, "Player is not in a game.")
+                utils.log(self, "Player is not in a game.", client)
                 await msg.channel.send(
                     "That player is not in a game (or is in a bot game)."
                 )
                 return
             
             if not game:
-                utils.log(self, "Can not receive game from League API Endpoint")
+                utils.log(self, "Can not receive game from League API Endpoint", client)
                 return
             
             team_1, team_2 = [], []
@@ -165,11 +165,11 @@ class Bets(Command, ReactionTrigger):
         try:
             game = utils.global_dragon.watcher.match.by_id(client.config["region"], game_id)
         except HTTPError as e:
-            utils.log(self, "The game is not over or does not exist!")
+            utils.log(self, "The game is not over or does not exist!", client)
             return
         
         if not game:
-            utils.log(self, "Can not receive game from League API Endpoint")
+            utils.log(self, "Can not receive game from League API Endpoint", client)
             return
         
         teams = game['teams']

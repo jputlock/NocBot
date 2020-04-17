@@ -65,7 +65,7 @@ class Draft(Command, ReactionTrigger):
             elif team == 1:
                 self.team_2.append(player)
             else:
-                utils.log(self, "Error making a pick!")
+                utils.log(self, "Error making a pick!", client)
 
         def get_content(self):
             self.turn += 1
@@ -121,7 +121,7 @@ class Draft(Command, ReactionTrigger):
         args = msg.content.split(" ")
 
         if len(args) < 3:
-            utils.log(self, "Tried to draft without at least 3 arguments")
+            utils.log(self, "Tried to draft without at least 3 arguments", client)
             await msg.channel.send(
                 f"Usage: {self.usage}"
             )
@@ -179,7 +179,7 @@ class Draft(Command, ReactionTrigger):
 
         for captain in captains:
             if captain not in players:
-                utils.log(self, f"{captain.name} is not in the voice channel!")
+                utils.log(self, f"{captain.name} is not in the voice channel!", client)
                 await msg.channel.send(
                     client.messages["draft_captain_not_connected"]
                 )
@@ -243,16 +243,16 @@ class Draft(Command, ReactionTrigger):
                 try:
                     await member.move_to(team_1_vc)
                 except Exception as e:
-                    utils.log(self, f"{e}")
-                    utils.log(self, f"Could not move {member.name} to Team 1")
+                    utils.log(self, f"{e}", client)
+                    utils.log(self, f"Could not move {member.name} to Team 1", client)
             
             for user in state.team_2:
                 member = client.SERVER.get_member(user.id)
                 try:
                     await member.move_to(team_2_vc)
                 except Exception as e:
-                    utils.log(self, f"{e}")
-                    utils.log(self, f"Could not move {member.name} to Team 2")
+                    utils.log(self, f"{e}", client)
+                    utils.log(self, f"Could not move {member.name} to Team 2", client)
             
             await msg.remove_reaction(reaction.emoji, client.user)
             return
@@ -261,11 +261,11 @@ class Draft(Command, ReactionTrigger):
             return
 
         if user not in state.captains:
-            utils.log(self, "Somebody who isn't a captain tried to go")
+            utils.log(self, "Somebody who isn't a captain tried to go", client)
             return
         
         if user != state.get_picking_captain():
-            utils.log(self, "A captain tried to go out of turn!")
+            utils.log(self, "A captain tried to go out of turn!", client)
             return
 
         # update it to swap the player to the correct team
