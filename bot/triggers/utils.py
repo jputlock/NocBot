@@ -30,8 +30,12 @@ team_names = [
     f"{team_symbols['red_team']} Team 2"
 ]
 
-draft_order = [
+snake_order = [
     0, 1, 1, 0, 1, 0, 0, 1
+]
+
+second_snake_order = [
+    0, 1, 0, 1, 1, 0, 0, 1
 ]
 
 no_matching_results_emote = "🚫"

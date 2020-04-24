@@ -25,7 +25,7 @@ class Draft(Command, ReactionTrigger):
 
         def get_picking_captain(self):
             if self.snake:
-                return self.captains[utils.draft_order[self.turn - 1]]
+                return self.captains[utils.snake_order[self.turn - 1]]
             return self.captains[(self.turn - 1) % 2]
 
         def parse_msg(self, client, message):
@@ -57,7 +57,7 @@ class Draft(Command, ReactionTrigger):
                     self.captains[1] = utils.user_from_mention(client, utils.find_first_mention(field.value))
                     self.team_2 = [utils.user_from_mention(client, utils.find_first_mention(line)) for line in field.value.split("\n")]
 
-        def make_pick(self, index):
+        def make_pick(self, index, client):
             player = self.unpicked.pop(index)
             team = self.captains.index(self.get_picking_captain())
             if team == 0:
@@ -171,11 +171,11 @@ class Draft(Command, ReactionTrigger):
             )
             return
 
-        # if len(players) != 10:
-        #     await msg.channel.send(
-        #         client.messages["need_ten_players"]
-        #     )
-        #     return
+        if len(players) != 10:
+            await msg.channel.send(
+                client.messages["need_ten_players"]
+            )
+            return
 
         for captain in captains:
             if captain not in players:
@@ -270,7 +270,7 @@ class Draft(Command, ReactionTrigger):
 
         # update it to swap the player to the correct team
 
-        state.make_pick(possible_emojis.index(reaction.emoji.name))
+        state.make_pick(possible_emojis.index(reaction.emoji.name), client)
 
         # update the message
 

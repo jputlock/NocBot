@@ -25,8 +25,9 @@ class GhostClient(discord.Client):
         roles_filename = path + roles_filename
         messages_filename = path + messages_filename
         self.log_filename = path + log_filename
-        with open(log_filename, "w") as fake_news:
-            pass
+
+        open(log_filename, "w")
+        
         with open(config_filename, "r") as config_file:
             self.config = json.load(config_file)
         
