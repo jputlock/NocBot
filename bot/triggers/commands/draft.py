@@ -171,7 +171,7 @@ class Draft(Command, ReactionTrigger):
             )
             return
         
-        players = [player in players if not player.bot]
+        players = [player for player in players if not player.bot]
 
         if len(players) != 10:
             await msg.channel.send(
