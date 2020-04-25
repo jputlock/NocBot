@@ -36,7 +36,7 @@ class Draft(Command, ReactionTrigger):
             else:
                 self.turn = int(re.search("Pick (\d+)", content).group(1))
 
-            if "\u200B" in content:
+            if utils.no_width_space in content:
                 self.snake = True
 
             embed = message.embeds[0]
@@ -73,7 +73,7 @@ class Draft(Command, ReactionTrigger):
             if len(self.unpicked) > 0:
                 answer = ""
                 if self.snake:
-                    answer += "\u200B"
+                    answer += utils.no_width_space
                 answer += f"Pick {self.turn}:\n{self.get_picking_captain().mention}, it's your turn to pick!"
                 return answer
             return "Finalized Teams:"
@@ -170,6 +170,8 @@ class Draft(Command, ReactionTrigger):
                 client.messages["caller_not_connected"]
             )
             return
+        
+        players = [player in players if not player.bot]
 
         if len(players) != 10:
             await msg.channel.send(

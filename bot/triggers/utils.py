@@ -40,6 +40,8 @@ second_snake_order = [
 
 no_matching_results_emote = "🚫"
 
+no_width_space = "\u200B"
+
 global_dragon = None
 
 async def generate_react_menu(
